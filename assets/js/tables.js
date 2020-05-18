@@ -17,6 +17,19 @@ class Tables {
         this.query += "FROM employee e LEFT JOIN role r ON e.role_id = r.id ";
         this.query += "LEFT JOIN department d ON r.department_id = d.id";
     }
+    department = function () {
+        return new Promise(function (resolve, reject) {
+            connection.query("SELECT * FROM department;", (err, data) => {
+                resolve(data);
+            });
+        })
+    }
+    addDepartment(name) {
+        connection.query("INSERT INTO department (name) VALUES (?);", name);
+    }
+    addRole(title, salary, department_id) {
+        connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);", [title, salary, department_id]);
+    }
     displayAllEmployee() {
         let tempQuery = this.query;
         this.query += ";";
