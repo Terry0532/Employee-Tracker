@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const cTable = require("console.table");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -43,7 +44,8 @@ class Tables {
                     data[i].manager = data[temp].Name;
                 }
             }
-            console.log(console.table(data));
+            const table = cTable.getTable(data);
+            console.log(table);
         });
     }
     connectionEnd() {
