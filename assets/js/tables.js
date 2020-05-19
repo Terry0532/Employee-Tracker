@@ -24,6 +24,13 @@ class Tables {
             });
         })
     }
+    role = function () {
+        return new Promise(function (resolve, reject) {
+            connection.query("SELECT * FROM role;", (err, data) => {
+                resolve(data);
+            });
+        })
+    }
     addDepartment(name) {
         connection.query("INSERT INTO department (name) VALUES (?);", name);
     }

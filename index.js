@@ -32,6 +32,9 @@ class Prompts {
                 case "Add a new role":
                     this.askForRoleDetails();
                     break;
+                case "Add a new employee":
+                    this.askForEmployeeDetails();
+                    break;
                 case "Exit":
                     tables.connectionEnd();
             }
@@ -50,13 +53,13 @@ class Prompts {
         });
     }
     askForRoleDetails() {
+        let self = this;
         tables.department().then(function (res) {
             let choices = [];
             let departmentArray = res;
             for (let i = 0; i < res.length; i++) {
                 choices.push(res[i].name);
             }
-            console.log(choices);
             inquirer.prompt([
                 {
                     type: "input",
@@ -82,8 +85,27 @@ class Prompts {
             ]).then(res => {
                 let temp = departmentArray.find(object => object.name === res.department);
                 tables.addRole(res.name, res.salary, temp.id);
+                self.allPrompts();
             });
         });
+    }
+    async askForEmployeeDetails() {
+        let role;
+        await tables.role().then(function (res) {
+            role = res;
+        })
+        // console.log(role);
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "test",
+                name: "name"
+            }
+        ]).then(res => {
+            console.log(res);
+            console.log(role);
+            this.allPrompts();
+        })
     }
 }
 
