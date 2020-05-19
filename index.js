@@ -54,7 +54,7 @@ class Prompts {
     }
     askForRoleDetails() {
         let self = this;
-        tables.department().then(function (res) {
+        tables.table("department").then(function (res) {
             let choices = [];
             let departmentArray = res;
             for (let i = 0; i < res.length; i++) {
@@ -91,10 +91,9 @@ class Prompts {
     }
     async askForEmployeeDetails() {
         let role;
-        await tables.role().then(function (res) {
+        await tables.table("role").then(function (res) {
             role = res;
         })
-        // console.log(role);
         inquirer.prompt([
             {
                 type: "input",

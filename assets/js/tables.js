@@ -9,16 +9,9 @@ class Tables {
         this.query += "FROM employee e LEFT JOIN role r ON e.role_id = r.id ";
         this.query += "LEFT JOIN department d ON r.department_id = d.id";
     }
-    department = function () {
+    table = function (tableName) {
         return new Promise(function (resolve, reject) {
-            connection.query("SELECT * FROM department;", (err, data) => {
-                resolve(data);
-            });
-        })
-    }
-    role = function () {
-        return new Promise(function (resolve, reject) {
-            connection.query("SELECT * FROM role;", (err, data) => {
+            connection.query("SELECT * FROM ??;", tableName, (err, data) => {
                 resolve(data);
             });
         })
