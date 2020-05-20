@@ -39,7 +39,7 @@ class Tables {
         connection.query("INSERT INTO department (name) VALUES (?);", name);
     }
     addRole(title, salary, department_id, management) {
-        connection.query("INSERT INTO role (title, salary, department_id, management) VALUES (?, ?, ?, ?);", [title, salary, department_id], management);
+        connection.query("INSERT INTO role (title, salary, department_id, management) VALUES (?, ?, ?, ?);", [title, salary, department_id, management]);
     }
     addEmployee(first_name, last_name, role, manager) {
         connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);", [first_name, last_name, role, manager]);

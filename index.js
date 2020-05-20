@@ -165,7 +165,6 @@ class Prompts {
             ]).then(res => {
                 const temp = departmentArray.find(department => department.name === res.department);
                 const tempManagement = res.management ? 1 : 0;
-                console.log(tempManagement);
                 tables.addRole(res.name, res.salary, temp.id, tempManagement);
                 self.allPrompts();
             });
