@@ -13,6 +13,7 @@ CREATE TABLE role (
     title VARCHAR(30) NOT NULL,
     salary DECIMAL(10,2) NOT NULL,
     department_id INT NOT NULL,
+    management BOOLEAN NOT NULL,
     PRIMARY KEY (id)
 );
 

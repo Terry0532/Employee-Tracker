@@ -14,13 +14,22 @@ class Tables {
             connection.query("SELECT * FROM ??;", tableName, (err, data) => {
                 resolve(data);
             });
-        })
+        });
+    }
+    managementLevelEmployee(cb) {
+        connection.query("SELECT e.id, CONCAT(first_name, ' ', last_name) AS Name FROM employee e LEFT JOIN role r ON e.role_id = r.id WHERE management = 1;", (err, data) => {
+            if (err) throw err;
+            cb(data);
+        });
     }
     addDepartment(name) {
         connection.query("INSERT INTO department (name) VALUES (?);", name);
     }
-    addRole(title, salary, department_id) {
-        connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);", [title, salary, department_id]);
+    addRole(title, salary, department_id, management) {
+        connection.query("INSERT INTO role (title, salary, department_id, management) VALUES (?, ?, ?, ?);", [title, salary, department_id], management);
+    }
+    addEmployee(first_name, last_name, role, manager) {
+        connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);", [first_name, last_name, role, manager]);
     }
     displayAllEmployee() {
         let tempQuery = this.query;

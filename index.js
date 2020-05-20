@@ -53,10 +53,10 @@ class Prompts {
         });
     }
     askForRoleDetails() {
-        let self = this;
+        const self = this;
         tables.table("department").then(function (res) {
-            let choices = [];
-            let departmentArray = res;
+            const choices = [];
+            const departmentArray = res;
             for (let i = 0; i < res.length; i++) {
                 choices.push(res[i].name);
             }
@@ -81,30 +81,70 @@ class Prompts {
                     message: "Under which department?",
                     name: "department",
                     choices: choices
+                }, {
+                    type: "confirm",
+                    message: "Is this a management level role?",
+                    name: "management"
                 }
             ]).then(res => {
-                let temp = departmentArray.find(object => object.name === res.department);
-                tables.addRole(res.name, res.salary, temp.id);
+                const temp = departmentArray.find(department => department.name === res.department);
+                const tempManagement = res.management ? 1 : 0;
+                console.log(tempManagement);
+                tables.addRole(res.name, res.salary, temp.id, tempManagement);
                 self.allPrompts();
             });
         });
     }
     async askForEmployeeDetails() {
-        let role;
+        const role = [];
+        let managerName = ["none"];
+        let roleTable;
+        let managementLevelEmployee;
         await tables.table("role").then(function (res) {
-            role = res;
-        })
+            roleTable = res;
+            for (let i = 0; i < res.length; i++) {
+                role.push(res[i].title);
+            }
+        });
+        await tables.managementLevelEmployee(function (result) {
+            managementLevelEmployee = result;
+            for (let i = 0; i < managementLevelEmployee.length; i++) {
+                managerName.push(managementLevelEmployee[i].Name);
+            }
+        });
         inquirer.prompt([
             {
                 type: "input",
-                message: "test",
-                name: "name"
+                message: "New employee's first name?",
+                name: "firstName"
+            }, {
+                type: "input",
+                message: "New employee's last name?",
+                name: "lastName"
+            }, {
+                type: "list",
+                message: "New employee's role?",
+                name: "role",
+                choices: role
+            }, {
+                type: "list",
+                message: "New employee's manager?",
+                name: "managerName",
+                choices: managerName
             }
         ]).then(res => {
-            console.log(res);
-            console.log(role);
+            const role = roleTable.find(role => role.title === res.role);
+            let managerId;
+            for (let i = 0; i < managementLevelEmployee.length; i++) {
+                if (res.managerName == managementLevelEmployee[i].Name) {
+                    managerId = managementLevelEmployee[i].id;
+                } else if (res.managerName === "none") {
+                    managerId = null;
+                }
+            }
+            tables.addEmployee(res.firstName, res.lastName, role.id, managerId);
             this.allPrompts();
-        })
+        });
     }
 }
 
