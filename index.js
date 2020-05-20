@@ -10,7 +10,7 @@ class Prompts {
                 type: "list",
                 message: "What would you like to do?",
                 name: "choices",
-                choices: ["View all employees", "View all employees by department", "View all employees by managers", "Add a new department", "Add a new role", "Add a new employee", "Exit"]
+                choices: ["View all employees", "View all employees by department", "View all employees by managers", "Add a new department", "Add a new role", "Add a new employee", "Update employee", "Exit"]
             }
         ]).then(res => {
             switch (res.choices) {
@@ -35,9 +35,69 @@ class Prompts {
                 case "Add a new employee":
                     this.askForEmployeeDetails();
                     break;
+                case "Update employee":
+                    this.updateEmployee();
+                    break;
                 case "Exit":
                     tables.connectionEnd();
             }
+        });
+    }
+    async updateEmployee() {
+        let allEmployeeAndId;
+        let roleTable;
+        const allEmployeeName = [];
+        const roleTitle = [];
+        const managerName = ["none"];
+        let managementLevelEmployee;
+        await tables.allEmployeeAndId().then(function (res) {
+            allEmployeeAndId = res;
+            for (let employee of res) {
+                allEmployeeName.push(employee.name);
+            }
+        });
+        await tables.table("role").then(function (res) {
+            roleTable = res;
+            for (let role of res) {
+                roleTitle.push(role.title);
+            }
+        });
+        tables.managementLevelEmployee(function (res) {
+            managementLevelEmployee = res;
+            for (let i = 0; i < managementLevelEmployee.length; i++) {
+                managerName.push(managementLevelEmployee[i].Name);
+            }
+        });
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Who do you want to update?",
+                name: "name",
+                choices: allEmployeeName
+            }, {
+                type: "list",
+                message: "What's their new role?",
+                name: "role",
+                choices: roleTitle
+            }, {
+                type: "list",
+                message: "Who's their new manager?",
+                name: "managerName",
+                choices: managerName
+            }
+        ]).then(res => {
+            const role = roleTable.find(role => role.title === res.role);
+            const employee = allEmployeeAndId.find(employee => employee.name === res.name);
+            let managerId;
+            for (let i = 0; i < managementLevelEmployee.length; i++) {
+                if (res.managerName == managementLevelEmployee[i].Name) {
+                    managerId = managementLevelEmployee[i].id;
+                } else if (res.managerName === "none") {
+                    managerId = null;
+                }
+            }
+            tables.updateEmployee(role.id, managerId, employee.id);
+            this.allPrompts();
         });
     }
     askForDepartmentName() {
@@ -97,16 +157,16 @@ class Prompts {
     }
     async askForEmployeeDetails() {
         const role = [];
-        let managerName = ["none"];
-        let roleTable;
+        const managerName = ["none"];
         let managementLevelEmployee;
+        let roleTable;
         await tables.table("role").then(function (res) {
             roleTable = res;
             for (let i = 0; i < res.length; i++) {
                 role.push(res[i].title);
             }
         });
-        await tables.managementLevelEmployee(function (result) {
+        tables.managementLevelEmployee(function (result) {
             managementLevelEmployee = result;
             for (let i = 0; i < managementLevelEmployee.length; i++) {
                 managerName.push(managementLevelEmployee[i].Name);

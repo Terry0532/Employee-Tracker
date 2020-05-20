@@ -9,9 +9,10 @@ class Tables {
         this.query += "FROM employee e LEFT JOIN role r ON e.role_id = r.id ";
         this.query += "LEFT JOIN department d ON r.department_id = d.id";
     }
-    table = function (tableName) {
+    table(tableName) {
         return new Promise(function (resolve, reject) {
             connection.query("SELECT * FROM ??;", tableName, (err, data) => {
+                if (err) throw err;
                 resolve(data);
             });
         });
@@ -30,6 +31,17 @@ class Tables {
     }
     addEmployee(first_name, last_name, role, manager) {
         connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);", [first_name, last_name, role, manager]);
+    }
+    updateEmployee(roleId, managerId, employeeId) {
+        connection.query("UPDATE employee SET role_id = ?, manager_id = ? WHERE employee.id = ?;", [roleId, managerId, employeeId]);
+    }
+    allEmployeeAndId() {
+        return new Promise(function (resolve, reject) {
+            connection.query("SELECT id, CONCAT(first_name, ' ', last_name) AS name FROM employee;", (err, data) => {
+                if (err) throw err;
+                resolve(data);
+            });
+        })
     }
     displayAllEmployee() {
         let tempQuery = this.query;
