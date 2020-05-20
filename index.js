@@ -10,7 +10,7 @@ class Prompts {
                 type: "list",
                 message: "What would you like to do?",
                 name: "choices",
-                choices: ["View all employees", "View all employees by department", "View all employees by managers", "Add a new department", "Add a new role", "Add a new employee", "Update employee", "Exit"]
+                choices: ["View all employees", "View all employees by department", "View all employees by managers", "Add a new department", "Add a new role", "Add a new employee", "Update employee", "Remove employee", "Exit"]
             }
         ]).then(res => {
             switch (res.choices) {
@@ -38,9 +38,29 @@ class Prompts {
                 case "Update employee":
                     this.updateEmployee();
                     break;
+                case "Remove employee":
+                    this.removeEmployee();
+                    break;
                 case "Exit":
                     tables.connectionEnd();
             }
+        });
+    }
+    removeEmployee() {
+        const self = this;
+        tables.fullNameTable().then(function (result) {
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Who do you want to remove?",
+                    name: "name",
+                    choices: result
+                }
+            ]).then(res => {
+                const removedEmployee = result.find(employee => employee.name === res.name);
+                tables.removeEmployee(removedEmployee.id);
+                self.allPrompts();
+            });
         });
     }
     async updateEmployee() {
@@ -115,11 +135,7 @@ class Prompts {
     askForRoleDetails() {
         const self = this;
         tables.table("department").then(function (res) {
-            const choices = [];
             const departmentArray = res;
-            for (let i = 0; i < res.length; i++) {
-                choices.push(res[i].name);
-            }
             inquirer.prompt([
                 {
                     type: "input",
@@ -140,7 +156,7 @@ class Prompts {
                     type: "list",
                     message: "Under which department?",
                     name: "department",
-                    choices: choices
+                    choices: res
                 }, {
                     type: "confirm",
                     message: "Is this a management level role?",
