@@ -71,6 +71,7 @@ class Tables {
                 }
             }
             const table = cTable.getTable(data);
+            console.log("\n");
             console.log(table);
         });
     }
